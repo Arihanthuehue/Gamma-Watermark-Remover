@@ -1,0 +1,9 @@
+[build]
+  publish = "public"
+  functions = "netlify/functions"
+  command = "" # Static site, no build command needed
+
+[[redirects]]
+  from = "/api/remove-watermark"
+  to = "/.netlify/functions/remove-watermark"
+  status = 200
