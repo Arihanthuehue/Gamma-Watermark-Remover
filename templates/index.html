@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Gamma Watermark Purge - Premium Web Application to instantly remove watermarks from exported Gamma Presentations and PDF documents.">
-  <title>Gamma Watermark Purge | Premium Document Cleaner</title>
+  <meta name="description" content="Gamma Purge - Premium Web Application to instantly remove watermarks from exported Gamma Presentations and PDF documents.">
+  <title>Gamma Purge | Clean Presentations</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
@@ -14,12 +14,8 @@
 
   <div class="app-container">
     <header>
-      <div class="logo-badge">
-        <span></span>
-        Made with Gamma Purge
-      </div>
-      <h1>Gamma Watermark Purge</h1>
-      <p class="subtitle">Instantly strip "Made with Gamma" badges, backgrounds, and links from exported presentations and PDFs with zero quality loss.</p>
+      <h1>Gamma Purge</h1>
+      <p class="subtitle">Minimalist watermark remover for exported presentations and PDFs.</p>
     </header>
 
     <main class="card" id="mainCard">
@@ -50,8 +46,8 @@
             <!-- Icon replaced by JS based on file type -->
           </div>
           <div class="file-info">
-            <div class="file-name" id="selectedFileName">presentation_pitch_deck.pptx</div>
-            <div class="file-size" id="selectedFileSize">14.2 MB</div>
+            <div class="file-name" id="selectedFileName">presentation.pptx</div>
+            <div class="file-size" id="selectedFileSize">0.0 MB</div>
           </div>
           <button class="btn-remove" id="btnRemove" title="Remove File">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -78,26 +74,7 @@
           <div class="spinner-inner"></div>
         </div>
         <div>
-          <h2 class="upload-title" style="margin-bottom: 0.5rem;">Purging Watermarks<span class="loading-dots"><span></span><span></span><span></span></span></h2>
-          <p class="upload-desc">Running forensic search and stripping layouts</p>
-        </div>
-        <div class="process-steps">
-          <div class="step-item" id="stepUpload">
-            <div class="step-icon">✓</div>
-            Uploading document securely...
-          </div>
-          <div class="step-item" id="stepAnalyze">
-            <div class="step-icon">✓</div>
-            Analyzing slide structures & media references...
-          </div>
-          <div class="step-item" id="stepStrip">
-            <div class="step-icon">✓</div>
-            Stripping watermark XML nodes & links...
-          </div>
-          <div class="step-item" id="stepRebuild">
-            <div class="step-icon">✓</div>
-            Compiling and packing final document...
-          </div>
+          <h2 class="upload-title" style="margin-bottom: 0.5rem; font-weight: 500;">Cleaning document<span class="loading-dots"><span></span><span></span><span></span></span></h2>
         </div>
       </div>
 
@@ -110,54 +87,19 @@
           </svg>
         </div>
         <div>
-          <h2 class="success-title">Purge Successful!</h2>
-          <p class="success-desc">The "Made with Gamma" watermarks and target links have been completely removed with zero quality loss.</p>
+          <h2 class="success-title" style="font-weight: 600;">Cleaned!</h2>
         </div>
         <div class="download-box">
           <button class="btn-download" id="btnDownload">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
             </svg>
-            Download Cleaned Document
+            Download File
           </button>
-          <button class="btn-reset" id="btnReset">Clean Another Document</button>
+          <button class="btn-reset" id="btnReset">Clean another</button>
         </div>
       </div>
     </main>
-
-    <!-- FOOTER FEATURES GRID -->
-    <div class="features-grid">
-      <div class="feature-item">
-        <div class="feature-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-            <circle cx="8.5" cy="8.5" r="1.5"></circle>
-            <polyline points="21 15 16 10 5 21"></polyline>
-          </svg>
-        </div>
-        <span class="feature-title">Perfect Cleanse</span>
-        <span class="feature-desc">Removes backgrounds, text layers, and links from layout structures.</span>
-      </div>
-      <div class="feature-item">
-        <div class="feature-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <polyline points="12 6 12 12 16 14"></polyline>
-          </svg>
-        </div>
-        <span class="feature-title">Lightning Speed</span>
-        <span class="feature-desc">Direct XML node modifications take less than a second to execute.</span>
-      </div>
-      <div class="feature-item">
-        <div class="feature-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-          </svg>
-        </div>
-        <span class="feature-title">Zero Compression</span>
-        <span class="feature-desc">Maintains high-definition resolutions of all graphics and fonts.</span>
-      </div>
-    </div>
   </div>
 
   <div id="toast" class="toast" style="display: none;">
@@ -170,9 +112,6 @@
   </div>
 
   <script>
-    // -------------------------------------------------------------
-    // Page State Manager & Interactions
-    // -------------------------------------------------------------
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
     const mainCard = document.getElementById('mainCard');
@@ -190,12 +129,6 @@
     const btnPurge = document.getElementById('btnPurge');
     const btnDownload = document.getElementById('btnDownload');
     const btnReset = document.getElementById('btnReset');
-    
-    // Process steps
-    const stepUpload = document.getElementById('stepUpload');
-    const stepAnalyze = document.getElementById('stepAnalyze');
-    const stepStrip = document.getElementById('stepStrip');
-    const stepRebuild = document.getElementById('stepRebuild');
     
     let activeFile = null;
     let downloadUrl = null;
@@ -241,7 +174,6 @@
       selectedFileName.textContent = file.name;
       selectedFileSize.textContent = formatBytes(file.size);
       
-      // Update file type preview icon
       if (ext === '.pptx') {
         fileIcon.innerHTML = `
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #ef4444;">
@@ -292,35 +224,19 @@
       mainCard.classList.remove('glow-active');
     }
 
-    // Purge trigger (upload & clean)
     btnPurge.addEventListener('click', async () => {
       if (!activeFile) return;
       
-      // Toggle to processing UI
       stateSelected.style.display = 'none';
       stateProcessing.style.display = 'flex';
-      
-      // Initialize step sequences
-      setStepState(stepUpload, 'active');
-      setStepState(stepAnalyze, 'pending');
-      setStepState(stepStrip, 'pending');
-      setStepState(stepRebuild, 'pending');
       
       const formData = new FormData();
       formData.append('file', activeFile);
       
       try {
-        // Step 1 delay to show upload animation
-        await sleep(1000);
-        setStepState(stepUpload, 'completed');
-        setStepState(stepAnalyze, 'active');
+        // Artificially wait briefly so the spinner transition is satisfying
+        const startTime = Date.now();
         
-        // Step 2 delay
-        await sleep(1200);
-        setStepState(stepAnalyze, 'completed');
-        setStepState(stepStrip, 'active');
-        
-        // Initiate server-side clean call
         const response = await fetch('/api/remove-watermark', {
           method: 'POST',
           body: formData
@@ -331,20 +247,16 @@
           throw new Error(errorJson.error || 'Server processing failed.');
         }
         
-        // Step 3 delay
-        setStepState(stepStrip, 'completed');
-        setStepState(stepRebuild, 'active');
-        await sleep(1000);
-        
-        // Grab output file as blob
         const fileBlob = await response.blob();
         downloadUrl = URL.createObjectURL(fileBlob);
         downloadName = 'no_watermark_' + activeFile.name;
         
-        setStepState(stepRebuild, 'completed');
-        await sleep(600);
+        // Enforce a minimum display time for the minimalist cleaner transition
+        const elapsed = Date.now() - startTime;
+        if (elapsed < 1500) {
+          await sleep(1500 - elapsed);
+        }
         
-        // Transition to success screen
         stateProcessing.style.display = 'none';
         stateSuccess.style.display = 'flex';
         
@@ -365,7 +277,6 @@
       document.body.removeChild(link);
     });
 
-    // Helper functions
     function formatBytes(bytes, decimals = 1) {
       if (bytes === 0) return '0 Bytes';
       const k = 1024;
@@ -373,15 +284,6 @@
       const sizes = ['Bytes', 'KB', 'MB', 'GB'];
       const i = Math.floor(Math.log(bytes) / Math.log(k));
       return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-    }
-
-    function setStepState(stepEl, state) {
-      stepEl.classList.remove('active', 'completed');
-      if (state === 'active') {
-        stepEl.classList.add('active');
-      } else if (state === 'completed') {
-        stepEl.classList.add('completed');
-      }
     }
 
     function sleep(ms) {
@@ -394,18 +296,14 @@
       toastText.textContent = message;
       toast.style.display = 'flex';
       
-      // Auto dismiss after 4 seconds
       setTimeout(() => {
         toast.style.animation = 'none';
-        // Trigger reflow to restart animation
         toast.offsetHeight; 
         toast.style.display = 'none';
       }, 4000);
     }
 
-    // -------------------------------------------------------------
-    // Dynamic Particle System for Wow-factor background
-    // -------------------------------------------------------------
+    // Canvas Background Particles
     const canvas = document.getElementById('particleCanvas');
     const ctx = canvas.getContext('2d');
     
@@ -437,8 +335,6 @@
       update() {
         this.x += this.speedX;
         this.y += this.speedY;
-        
-        // Fade in/out gently
         this.alpha += Math.random() * 0.02 - 0.01;
         if (this.alpha <= 0) this.alpha = 0.05;
         if (this.alpha > 0.6) this.alpha = 0.6;
@@ -454,11 +350,10 @@
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         
-        // Alternate colors
         if (this.size > 3) {
-          ctx.fillStyle = '#8b5cf6'; // purple
+          ctx.fillStyle = '#8b5cf6';
         } else {
-          ctx.fillStyle = '#3b82f6'; // blue
+          ctx.fillStyle = '#3b82f6';
         }
         ctx.shadowBlur = 10;
         ctx.shadowColor = ctx.fillStyle;
