@@ -234,7 +234,6 @@
       formData.append('file', activeFile);
       
       try {
-        // Artificially wait briefly so the spinner transition is satisfying
         const startTime = Date.now();
         
         const response = await fetch('/api/remove-watermark', {
@@ -243,15 +242,22 @@
         });
         
         if (!response.ok) {
-          const errorJson = await response.json();
-          throw new Error(errorJson.error || 'Server processing failed.');
+          const contentType = response.headers.get("content-type");
+          let errorMessage = "Server processing failed.";
+          
+          if (contentType && contentType.includes("application/json")) {
+            const errorJson = await response.json();
+            errorMessage = errorJson.error || errorMessage;
+          } else {
+            errorMessage = `Server Error: ${response.status} ${response.statusText} (Functions are activating on Netlify, please wait 30s)`;
+          }
+          throw new Error(errorMessage);
         }
         
         const fileBlob = await response.blob();
         downloadUrl = URL.createObjectURL(fileBlob);
         downloadName = 'no_watermark_' + activeFile.name;
         
-        // Enforce a minimum display time for the minimalist cleaner transition
         const elapsed = Date.now() - startTime;
         if (elapsed < 1500) {
           await sleep(1500 - elapsed);
@@ -300,7 +306,7 @@
         toast.style.animation = 'none';
         toast.offsetHeight; 
         toast.style.display = 'none';
-      }, 4000);
+      }, 6000);
     }
 
     // Canvas Background Particles
