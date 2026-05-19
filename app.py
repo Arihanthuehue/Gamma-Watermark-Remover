@@ -8,11 +8,8 @@ from flask import Flask, request, render_template, send_file, jsonify
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(__file__), 'uploads')
+app.config['UPLOAD_FOLDER'] = tempfile.gettempdir()
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50 MB limits
-
-# Ensure upload directory exists
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 def clean_pptx(in_path, out_path):
     """
@@ -191,26 +188,35 @@ def remove_watermark():
         if not os.path.exists(output_path):
             return jsonify({'error': 'Failed to process file.'}), 500
             
-        # Send back the cleaned file
+        # Read the file into memory to clean up disk immediately
+        import io
+        with open(output_path, "rb") as f:
+            file_data = f.read()
+            
+        # Clean up temp files immediately
+        for temp_path in [input_path, output_path]:
+            try:
+                if os.path.exists(temp_path):
+                    os.remove(temp_path)
+            except Exception:
+                pass
+                
+        # Send back the cleaned file from memory
         return send_file(
-            output_path,
+            io.BytesIO(file_data),
             as_attachment=True,
-            download_name=f"no_watermark_{filename.replace('orig_', '')}"
+            download_name=f"no_watermark_{filename}"
         )
         
     except Exception as e:
+        # Clean up temp files if they still exist on error
+        for temp_path in [input_path, output_path]:
+            try:
+                if os.path.exists(temp_path):
+                    os.remove(temp_path)
+            except Exception:
+                pass
         return jsonify({'error': f"Internal error during cleaning: {str(e)}"}), 500
-        
-    finally:
-        # Clean up input file after sending (output is handled, but we can clean up both asynchronously or later.
-        # However, to avoid file lock issues on Windows, let's keep them in the uploads dir and let them overwrite,
-        # or delete them in an app teardown context. It is fine to keep them inuploads/ as they will get overwritten
-        # when the same file name is uploaded, or we can write a simple clean-up thread.
-        try:
-            if os.path.exists(input_path):
-                os.remove(input_path)
-        except Exception:
-            pass
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
