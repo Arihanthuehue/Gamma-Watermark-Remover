@@ -1,2 +1,15 @@
 # Local Netlify folder
 .netlify
+
+# Python environment & cache
+__pycache__/
+*.pyc
+
+# Local upload & temporary directories
+uploads/
+/uploads
+temp/
+/temp
+
+# Vercel deployment folder
+.vercel
