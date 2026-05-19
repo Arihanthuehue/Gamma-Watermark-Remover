@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Gamma Watermark Purge - Premium Web Application to instantly remove watermarks from exported Gamma Presentations and PDF documents.">
+  <title>Gamma Watermark Purge | Premium Document Cleaner</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <!-- Full-screen background grids and canvas particles -->
+  <div class="bg-grid"></div>
+  <canvas id="particleCanvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.4;"></canvas>
+
+  <div class="app-container">
+    <header>
+      <div class="logo-badge">
+        <span></span>
+        Made with Gamma Purge
+      </div>
+      <h1>Gamma Watermark Purge</h1>
+      <p class="subtitle">Instantly strip "Made with Gamma" badges, backgrounds, and links from exported presentations and PDFs with zero quality loss.</p>
+    </header>
+
+    <main class="card" id="mainCard">
+      <!-- STATE 1: UPLOAD ZONE -->
+      <div id="stateUpload">
+        <div class="upload-zone" id="dropZone">
+          <input type="file" id="fileInput" accept=".pptx,.pdf">
+          <div class="upload-icon-container">
+            <svg viewBox="0 0 24 24">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+            </svg>
+          </div>
+          <div class="upload-text">
+            <span class="upload-title">Drag & drop your presentation</span>
+            <span class="upload-desc">or click to browse your local files</span>
+          </div>
+          <div class="format-tags">
+            <span class="tag pptx">PowerPoint (.pptx)</span>
+            <span class="tag pdf">Acrobat PDF (.pdf)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATE 2: SELECTED FILE VIEW -->
+      <div id="stateSelected" class="file-details-container">
+        <div class="file-item">
+          <div class="file-preview-icon" id="fileIcon">
+            <!-- Icon replaced by JS based on file type -->
+          </div>
+          <div class="file-info">
+            <div class="file-name" id="selectedFileName">presentation_pitch_deck.pptx</div>
+            <div class="file-size" id="selectedFileSize">14.2 MB</div>
+          </div>
+          <button class="btn-remove" id="btnRemove" title="Remove File">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              <line x1="10" y1="11" x2="10" y2="17"></line>
+              <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+          </button>
+        </div>
+        <button class="btn-action" id="btnPurge">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+          Purge Watermark
+        </button>
+      </div>
+
+      <!-- STATE 3: PROCESSING LOADER -->
+      <div id="stateProcessing" class="processing-container">
+        <div class="spinner-outer">
+          <div class="spinner-inner"></div>
+          <div class="spinner-inner"></div>
+          <div class="spinner-inner"></div>
+        </div>
+        <div>
+          <h2 class="upload-title" style="margin-bottom: 0.5rem;">Purging Watermarks<span class="loading-dots"><span></span><span></span><span></span></span></h2>
+          <p class="upload-desc">Running forensic search and stripping layouts</p>
+        </div>
+        <div class="process-steps">
+          <div class="step-item" id="stepUpload">
+            <div class="step-icon">✓</div>
+            Uploading document securely...
+          </div>
+          <div class="step-item" id="stepAnalyze">
+            <div class="step-icon">✓</div>
+            Analyzing slide structures & media references...
+          </div>
+          <div class="step-item" id="stepStrip">
+            <div class="step-icon">✓</div>
+            Stripping watermark XML nodes & links...
+          </div>
+          <div class="step-item" id="stepRebuild">
+            <div class="step-icon">✓</div>
+            Compiling and packing final document...
+          </div>
+        </div>
+      </div>
+
+      <!-- STATE 4: SUCCESS VIEW -->
+      <div id="stateSuccess" class="success-container">
+        <div class="success-icon-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+        </div>
+        <div>
+          <h2 class="success-title">Purge Successful!</h2>
+          <p class="success-desc">The "Made with Gamma" watermarks and target links have been completely removed with zero quality loss.</p>
+        </div>
+        <div class="download-box">
+          <button class="btn-download" id="btnDownload">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+            </svg>
+            Download Cleaned Document
+          </button>
+          <button class="btn-reset" id="btnReset">Clean Another Document</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- FOOTER FEATURES GRID -->
+    <div class="features-grid">
+      <div class="feature-item">
+        <div class="feature-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <polyline points="21 15 16 10 5 21"></polyline>
+          </svg>
+        </div>
+        <span class="feature-title">Perfect Cleanse</span>
+        <span class="feature-desc">Removes backgrounds, text layers, and links from layout structures.</span>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+        </div>
+        <span class="feature-title">Lightning Speed</span>
+        <span class="feature-desc">Direct XML node modifications take less than a second to execute.</span>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+        </div>
+        <span class="feature-title">Zero Compression</span>
+        <span class="feature-desc">Maintains high-definition resolutions of all graphics and fonts.</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" style="display: none;">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="8" x2="12" y2="12"></line>
+      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+    </svg>
+    <span id="toastText">An error occurred!</span>
+  </div>
+
+  <script>
+    // -------------------------------------------------------------
+    // Page State Manager & Interactions
+    // -------------------------------------------------------------
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const mainCard = document.getElementById('mainCard');
+    
+    const stateUpload = document.getElementById('stateUpload');
+    const stateSelected = document.getElementById('stateSelected');
+    const stateProcessing = document.getElementById('stateProcessing');
+    const stateSuccess = document.getElementById('stateSuccess');
+    
+    const selectedFileName = document.getElementById('selectedFileName');
+    const selectedFileSize = document.getElementById('selectedFileSize');
+    const fileIcon = document.getElementById('fileIcon');
+    
+    const btnRemove = document.getElementById('btnRemove');
+    const btnPurge = document.getElementById('btnPurge');
+    const btnDownload = document.getElementById('btnDownload');
+    const btnReset = document.getElementById('btnReset');
+    
+    // Process steps
+    const stepUpload = document.getElementById('stepUpload');
+    const stepAnalyze = document.getElementById('stepAnalyze');
+    const stepStrip = document.getElementById('stepStrip');
+    const stepRebuild = document.getElementById('stepRebuild');
+    
+    let activeFile = null;
+    let downloadUrl = null;
+    let downloadName = '';
+
+    // Drag and drop event handlers
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropZone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+      }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+      }, false);
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      if (files.length > 0) {
+        handleFileSelect(files[0]);
+      }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      if (fileInput.files.length > 0) {
+        handleFileSelect(fileInput.files[0]);
+      }
+    });
+
+    function handleFileSelect(file) {
+      const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+      if (ext !== '.pptx' && ext !== '.pdf') {
+        showToast('Invalid file format. Please upload a PPTX or PDF presentation.');
+        return;
+      }
+      
+      activeFile = file;
+      selectedFileName.textContent = file.name;
+      selectedFileSize.textContent = formatBytes(file.size);
+      
+      // Update file type preview icon
+      if (ext === '.pptx') {
+        fileIcon.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #ef4444;">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <path d="M10 16v-6a2 2 0 0 1 4 0v6"></path>
+            <line x1="10" y1="13" x2="14" y2="13"></line>
+          </svg>
+        `;
+        fileIcon.style.background = 'rgba(239, 68, 68, 0.1)';
+      } else {
+        fileIcon.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #3b82f6;">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+        `;
+        fileIcon.style.background = 'rgba(59, 130, 246, 0.1)';
+      }
+
+      stateUpload.style.display = 'none';
+      stateSelected.style.display = 'flex';
+      mainCard.classList.add('glow-active');
+    }
+
+    btnRemove.addEventListener('click', () => {
+      resetToUpload();
+    });
+
+    btnReset.addEventListener('click', () => {
+      resetToUpload();
+    });
+
+    function resetToUpload() {
+      activeFile = null;
+      fileInput.value = '';
+      if (downloadUrl) {
+        URL.revokeObjectURL(downloadUrl);
+        downloadUrl = null;
+      }
+      stateSelected.style.display = 'none';
+      stateProcessing.style.display = 'none';
+      stateSuccess.style.display = 'none';
+      stateUpload.style.display = 'block';
+      mainCard.classList.remove('glow-active');
+    }
+
+    // Purge trigger (upload & clean)
+    btnPurge.addEventListener('click', async () => {
+      if (!activeFile) return;
+      
+      // Toggle to processing UI
+      stateSelected.style.display = 'none';
+      stateProcessing.style.display = 'flex';
+      
+      // Initialize step sequences
+      setStepState(stepUpload, 'active');
+      setStepState(stepAnalyze, 'pending');
+      setStepState(stepStrip, 'pending');
+      setStepState(stepRebuild, 'pending');
+      
+      const formData = new FormData();
+      formData.append('file', activeFile);
+      
+      try {
+        // Step 1 delay to show upload animation
+        await sleep(1000);
+        setStepState(stepUpload, 'completed');
+        setStepState(stepAnalyze, 'active');
+        
+        // Step 2 delay
+        await sleep(1200);
+        setStepState(stepAnalyze, 'completed');
+        setStepState(stepStrip, 'active');
+        
+        // Initiate server-side clean call
+        const response = await fetch('/api/remove-watermark', {
+          method: 'POST',
+          body: formData
+        });
+        
+        if (!response.ok) {
+          const errorJson = await response.json();
+          throw new Error(errorJson.error || 'Server processing failed.');
+        }
+        
+        // Step 3 delay
+        setStepState(stepStrip, 'completed');
+        setStepState(stepRebuild, 'active');
+        await sleep(1000);
+        
+        // Grab output file as blob
+        const fileBlob = await response.blob();
+        downloadUrl = URL.createObjectURL(fileBlob);
+        downloadName = 'no_watermark_' + activeFile.name;
+        
+        setStepState(stepRebuild, 'completed');
+        await sleep(600);
+        
+        // Transition to success screen
+        stateProcessing.style.display = 'none';
+        stateSuccess.style.display = 'flex';
+        
+      } catch (err) {
+        showToast(err.message);
+        stateProcessing.style.display = 'none';
+        stateSelected.style.display = 'flex';
+      }
+    });
+
+    btnDownload.addEventListener('click', () => {
+      if (!downloadUrl) return;
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = downloadName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
+
+    // Helper functions
+    function formatBytes(bytes, decimals = 1) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const dm = decimals < 0 ? 0 : decimals;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    }
+
+    function setStepState(stepEl, state) {
+      stepEl.classList.remove('active', 'completed');
+      if (state === 'active') {
+        stepEl.classList.add('active');
+      } else if (state === 'completed') {
+        stepEl.classList.add('completed');
+      }
+    }
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      const toastText = document.getElementById('toastText');
+      toastText.textContent = message;
+      toast.style.display = 'flex';
+      
+      // Auto dismiss after 4 seconds
+      setTimeout(() => {
+        toast.style.animation = 'none';
+        // Trigger reflow to restart animation
+        toast.offsetHeight; 
+        toast.style.display = 'none';
+      }, 4000);
+    }
+
+    // -------------------------------------------------------------
+    // Dynamic Particle System for Wow-factor background
+    // -------------------------------------------------------------
+    const canvas = document.getElementById('particleCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    let particles = [];
+    const particleCount = 25;
+    
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    
+    class Particle {
+      constructor() {
+        this.reset();
+      }
+      
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 4 + 1;
+        this.speedX = Math.random() * 0.4 - 0.2;
+        this.speedY = Math.random() * 0.4 - 0.2;
+        this.alpha = Math.random() * 0.5 + 0.1;
+      }
+      
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        
+        // Fade in/out gently
+        this.alpha += Math.random() * 0.02 - 0.01;
+        if (this.alpha <= 0) this.alpha = 0.05;
+        if (this.alpha > 0.6) this.alpha = 0.6;
+        
+        if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+          this.reset();
+        }
+      }
+      
+      draw() {
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        
+        // Alternate colors
+        if (this.size > 3) {
+          ctx.fillStyle = '#8b5cf6'; // purple
+        } else {
+          ctx.fillStyle = '#3b82f6'; // blue
+        }
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = ctx.fillStyle;
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+    
+    for (let i = 0; i < particleCount; i++) {
+      particles.push(new Particle());
+    }
+    
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      requestAnimationFrame(animate);
+    }
+    
+    animate();
+  </script>
+</body>
+</html>
